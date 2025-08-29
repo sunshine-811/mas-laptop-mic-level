@@ -2,9 +2,12 @@
 Import-Module AudioDeviceCmdlets
 
 # Get all capture (input) devices
-$devices = Get-AudioDevice -List | Where-Object { $_.Type -eq 'Capture' -and $_.Name -like '*Jabra*' }
+$devices = Get-AudioDevice -List | Where-Object { $_.Type -eq 'Recording' -and $_.Name -like '*Jabra*' }
 
-foreach ($device in $devices) {
-    Write-Host "Setting input level for: $($device.Name)"
-    Set-AudioDevice -InputVolume 100 -Index $device.Index
+$devices | ForEach-Object {
+    Write-Host "Setting input level for: $($_.Index) - $($_.Name)"
+    $_ | Set-AudioDevice
+    Set-AudioDevice -RecordingMute 0
+    Set-AudioDevice -RecordingVolume 100
+    Set-AudioDevice -RecordingCommunicationVolume 100
 }
